@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeafLens - AI Plant Identifier</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-leaf"></i> LeafLens</h1>
+            <p data-i18n="tagline">Identifikasi tanaman dan pelajari cara merawatnya dengan cepat.</p>
+            <div class="language-picker">
+                <label for="language-select" data-i18n="languageLabel">Bahasa</label>
+                <select id="language-select">
+                    <option value="id">Indonesia</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Upload Section -->
+        <section class="upload-section">
+            <div class="card">
+                <h2 data-i18n="identifyTitle">Identifikasi Tanaman Baru</h2>
+                <div class="ai-panel">
+                    <div>
+                        <strong><i class="fas fa-wand-magic-sparkles"></i> <span data-i18n="aiTitle">AI Gemini</span></strong>
+                        <p id="ai-status" data-i18n="aiChecking">Mengecek koneksi AI dari server...</p>
+                    </div>
+                </div>
+                <div class="mode-tabs" role="group" aria-label="Analysis mode">
+                    <button class="mode-tab active" type="button" data-mode="identify">
+                        <i class="fas fa-leaf"></i> <span data-i18n="modeIdentify">Analisis Tanaman</span>
+                    </button>
+                    <button class="mode-tab" type="button" data-mode="compare">
+                        <i class="fas fa-code-compare"></i> <span data-i18n="modeCompare">Komparasi</span>
+                    </button>
+                </div>
+                <div class="upload-area" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/*" capture="environment" hidden>
+                    <div class="upload-placeholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p data-i18n="uploadText">Klik atau tarik gambar ke sini</p>
+                        <span data-i18n="uploadHint">Mendukung JPG, PNG</span>
+                    </div>
+                    <video id="camera-preview" class="hidden" autoplay playsinline></video>
+                    <canvas id="camera-canvas" class="hidden"></canvas>
+                    <img id="image-preview" src="" alt="Preview" class="hidden">
+                </div>
+                <div id="compare-upload" class="compare-upload hidden">
+                    <label for="compare-file-input" data-i18n="compareSecondPhoto">Foto kedua untuk dibandingkan</label>
+                    <input type="file" id="compare-file-input" accept="image/*">
+                    <img id="compare-image-preview" src="" alt="Preview kedua" class="hidden">
+                </div>
+                <div class="camera-actions">
+                    <button id="camera-btn" class="btn-secondary" type="button">
+                        <i class="fas fa-camera"></i> <span data-i18n="openCamera">Buka Kamera</span>
+                    </button>
+                    <button id="capture-btn" class="btn-secondary hidden" type="button">
+                        <i class="fas fa-circle"></i> <span data-i18n="capturePhoto">Ambil Foto</span>
+                    </button>
+                    <button id="close-camera-btn" class="btn-light hidden" type="button">
+                        <i class="fas fa-times"></i> <span data-i18n="closeCamera">Tutup Kamera</span>
+                    </button>
+                </div>
+                <button id="identify-btn" class="btn-primary" disabled>
+                    <i class="fas fa-search"></i> <span data-i18n="identifyButton">Analisis Tanaman</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p data-i18n="loadingText">Menganalisis detail tanaman...</p>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="hidden">
+            <div class="result-grid">
+                <!-- Basic Info -->
+                <div class="card info-card">
+                    <div class="badge" id="res-confidence">95% Cocok</div>
+                    <h2 id="res-name">Nama Tanaman</h2>
+                    <p class="scientific-name" id="res-sci-name">Nama Ilmiah</p>
+                    <p id="res-description">Deskripsi tanaman...</p>
+                </div>
+
+                <!-- Care Info -->
+                <div class="card care-card">
+                    <h3><i class="fas fa-hand-holding-heart"></i> <span data-i18n="careGuide">Panduan Perawatan</span></h3>
+                    <div class="care-item">
+                        <i class="fas fa-tint"></i>
+                        <div><strong data-i18n="wateringLabel">Penyiraman:</strong> <div id="res-water" class="text-paragraphs">Info</div></div>
+                    </div>
+                    <div class="care-item">
+                        <i class="fas fa-sun"></i>
+                        <div><strong data-i18n="sunlightLabel">Cahaya:</strong> <div id="res-sun" class="text-paragraphs">Info</div></div>
+                    </div>
+                    <div class="care-item">
+                        <i class="fas fa-seedling"></i>
+                        <div><strong data-i18n="soilLabel">Tanah:</strong> <div id="res-soil" class="text-paragraphs">Info</div></div>
+                    </div>
+                </div>
+
+                <!-- Pests Section -->
+                <div class="card pest-card">
+                    <h3><i class="fas fa-bug"></i> <span data-i18n="pestsTitle">Hama & Penyakit</span></h3>
+                    <div id="res-pests">
+                        <!-- Pest items injected here -->
+                    </div>
+                </div>
+            </div>
+            <button id="save-btn" class="btn-secondary">
+                <i class="fas fa-bookmark"></i> <span data-i18n="saveButton">Simpan ke Jurnal</span>
+            </button>
+        </section>
+
+        <!-- Journal Section -->
+        <section class="journal-section">
+            <div class="journal-heading">
+                <div>
+                    <h2><i class="fas fa-book-open"></i> <span data-i18n="journalTitle">Buku Koleksi Tanaman</span></h2>
+                    <p data-i18n="journalSubtitle">Kartu tanaman yang pernah kamu identifikasi dan simpan.</p>
+                </div>
+                <div class="collection-count" id="collection-count">0</div>
+            </div>
+            <div id="reminder-board" class="reminder-board"></div>
+            <div id="journal-grid" class="journal-grid">
+                <!-- Journal cards injected here -->
+            </div>
+        </section>
+    </main>
+
+    <div id="plant-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="modal-close" type="button" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LeafLens AI. Powered by Gemini.</p>
+    </footer>
+
+    <script src="script.js?v=2"></script>
+</body>
+</html>
