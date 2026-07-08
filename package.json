@@ -6,5 +6,5 @@
     "node": ">=18"
   },
   "scripts": {
-    "dev": "node server.js"
+    "dev": "node local-dev.js"
   }
