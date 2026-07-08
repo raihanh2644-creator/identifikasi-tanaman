@@ -8,3 +8,4 @@
   "scripts": {
     "dev": "node local-dev.js"
   }
+}
