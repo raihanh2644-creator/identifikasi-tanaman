@@ -226,6 +226,31 @@ function renderParagraphs(value) {
 dropZone.addEventListener('click', () => {
     if (!cameraStream) fileInput.click();
 });
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.style.backgroundColor = '#e9f5ee';
+    dropZone.style.borderColor = '#2d6a4f';
+});
+dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.style.backgroundColor = '';
+    dropZone.style.borderColor = '';
+});
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.style.backgroundColor = '';
+    dropZone.style.borderColor = '';
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    }
+});
 fileInput.addEventListener('change', handleFile);
 compareFileInput.addEventListener('change', handleCompareFile);
 identifyBtn.addEventListener('click', identifyPlant);
@@ -971,6 +996,10 @@ function closePlantModal() {
 }
 
 function deleteJournalItem(id) {
+    const message = currentLanguage === 'id'
+        ? 'Yakin ingin menghapus tanaman ini dari jurnal?'
+        : 'Are you sure you want to delete this plant from the journal?';
+    if (!confirm(message)) return;
     let journal = JSON.parse(localStorage.getItem('plantJournal') || '[]');
     journal = journal.filter(item => item.id !== id);
     localStorage.setItem('plantJournal', JSON.stringify(journal));
