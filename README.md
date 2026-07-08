@@ -60,17 +60,6 @@ Proyek ini sangat ringan dan menggunakan modul bawaan Node.js, sehingga **tidak 
    Buka URL berikut di browser Anda:
    👉 **http://localhost:8001**
 
-## 🌐 Panduan Deployment di Vercel
-
-Proyek ini sudah dioptimalkan untuk di-deploy di [Vercel](https://vercel.com).
-
-1. Buat proyek baru di Vercel dan hubungkan dengan repository GitHub Anda.
-2. Di bagian **Settings > General > Framework Preset**, pastikan Anda memilih **`Other`**.
-   *(Catatan: Jangan pilih Node.js agar Vercel dapat menyajikan file statis dengan cepat).*
-3. Masuk ke **Settings > Environment Variables**, lalu tambahkan:
-   - `GEMINI_API_KEY` (Isi dengan API Key Google Gemini Anda)
-   - `GEMINI_MODEL` dengan nilai `gemini-2.5-flash`
-4. Klik **Deploy**.
 
 ## 📝 Catatan Tambahan
 - Fitur kamera mungkin tidak bisa diakses jika Anda tidak menggunakan `localhost` atau HTTPS (pembatasan privasi standar browser).
